@@ -5,15 +5,15 @@ use ::memchr::memchr;
 use serialport::SerialPort;
 use std::{sync::Mutex, time::Duration};
 
-// Global Serial Port
-pub struct PortState(Mutex<Option<Box<dyn SerialPort>>>);
+struct PortState {
+    port: Mutex<Option<Box<dyn SerialPort>>>,
+}
 
 #[tauri::command]
 fn print_serial_ports() -> Vec<String> {
     let ports = serialport::available_ports();
     match ports {
         Ok(x) => {
-            // Returns all of the Port Names to UI
             return x
                 .iter()
                 .map(|p| -> String {
@@ -28,13 +28,20 @@ fn print_serial_ports() -> Vec<String> {
 
 #[tauri::command]
 fn open_serial_port(port_state: tauri::State<PortState>, port_name: &str, baud_rate: u32) -> bool {
-    let new_port = serialport::new(port_name, baud_rate)
+    let new_port_result = serialport::new(port_name, baud_rate)
         .timeout(Duration::from_millis(1000))
-        .open()
-        .expect("Error opening Port"); // TODO: Pattern Match here.
+        .open();
+
+    let new_port = match new_port_result {
+        Ok(p) => p,
+        Err(e) => {
+            println!("{}", e);
+            return false;
+        }
+    };
 
     // Check the Port State.
-    let port_guard_result = port_state.0.lock();
+    let port_guard_result = port_state.port.lock();
     match port_guard_result {
         // Update the current Port
         Ok(mut port) => {
@@ -51,8 +58,22 @@ fn open_serial_port(port_state: tauri::State<PortState>, port_name: &str, baud_r
 
 #[tauri::command]
 fn read_from_serial_port(port_state: tauri::State<PortState>) -> String {
-    let mut port_guard = port_state.0.lock().unwrap();
-    let port = port_guard.as_mut().unwrap();
+    // Get Mutex
+    let mut port_guard = match port_state.port.lock() {
+        Ok(p) => p,
+        Err(e) => {
+            println!("{}", e);
+            return String::from("");
+        }
+    };
+
+    // Get Port from Option
+    let port = match &mut *port_guard {
+        Some(p) => p,
+        None => {
+            return String::from("");
+        }
+    };
 
     let mut serial_buf: [u8; 64] = [0; 64];
     port.read(&mut serial_buf).expect("No Bytes!");
@@ -71,7 +92,9 @@ fn read_from_serial_port(port_state: tauri::State<PortState>) -> String {
 
 fn main() {
     tauri::Builder::default()
-        .manage(PortState(Default::default()))
+        .manage(PortState {
+            port: Mutex::new(None),
+        })
         .invoke_handler(tauri::generate_handler![
             print_serial_ports,
             open_serial_port,
