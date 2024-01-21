@@ -5,8 +5,7 @@
     let serialPortList:string[] = [];
 
     async function print_ports() {
-        let returnMsg: string[] = await invoke("print_ports");
-        serialPortList = returnMsg;
+        serialPortList = await invoke("print_serial_ports");
     }
 </script>
 

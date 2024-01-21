@@ -1,6 +1,8 @@
 <script lang="ts">
     import { Tabs, TabItem } from 'flowbite-svelte';
     import PrintPorts from './lib/PrintPorts.svelte';
+    import OpenPort from './lib/OpenPort.svelte';
+    import ReadPort from './lib/ReadPort.svelte';
 
     // We will have two screens.
     // One for the MSP430
@@ -29,6 +31,8 @@
       <TabItem title="Utilities">
         <div class="text-center">
             <PrintPorts />
+            <OpenPort />
+            <ReadPort />
         </div>
       </TabItem>
     </Tabs>

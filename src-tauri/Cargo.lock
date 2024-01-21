@@ -150,6 +150,7 @@ dependencies = [
 name = "bq-evm"
 version = "0.0.0"
 dependencies = [
+ "memchr",
  "serde",
  "serde_json",
  "serialport",
