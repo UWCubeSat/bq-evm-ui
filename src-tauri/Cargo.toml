@@ -1,6 +1,6 @@
 [package]
 name = "bq-evm"
-version = "0.0.0"
+version = "0.1.0"
 description = "A GUI for interfacing with the BQ76925-EVM using an Arduino Board"
 authors = ["Muki Kiboigo"]
 license = "MIT"

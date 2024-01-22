@@ -1,17 +1,27 @@
 <script lang="ts">
     import { invoke } from "@tauri-apps/api/tauri";
-    import { Button, ButtonGroup, Input, Textarea } from "flowbite-svelte";
+    import { Button, ButtonGroup, Input } from "flowbite-svelte";
+    import { afterUpdate } from "svelte";
 
     export let port: string | null;
 
-
+    let logElement:Element;
     let logIndex = 0;
-    let log: string[] = new Array(10);
-    let logString: string = "";
+    let log: string[] = [];
     let data: string = "";
+    
+    const scrollToBottom = async (node:Element) => {
+        node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
+    };
 
+    afterUpdate(() => {
+		if(log) scrollToBottom(logElement);
+    });
+	
     $: {
-        logString = log.join("\n");
+        if(log && logElement) {
+            scrollToBottom(logElement);
+        }
     }
 
     async function read_from_serial_port() {
@@ -21,18 +31,25 @@
 
     async function write_serial_port() {
         await invoke("write_to_serial_port", {data: data + "\n"});
-        let response = await read_from_serial_port();
         let date:Date = new Date();
-        log[logIndex] = date.toISOString() + " (UI): " +  data;
-        logIndex = (logIndex + 1) % 10;
-        log[logIndex] = date.toISOString() + " (EVM): " + response.substring(0, response.lastIndexOf('\n'));
-        logIndex = (logIndex + 1) % 10;
+        log[logIndex++] = date.toISOString() + " (UI): " +  data;
+        let response = await read_from_serial_port();
+        date = new Date();
+        log[logIndex++] = date.toISOString() + " (EVM): " + response.substring(0, response.lastIndexOf('\n'));
         data = "";
     }
 
+    afterUpdate(() => {
+        if(log) scrollToBottom(logElement);
+    })
+
 </script>
 
-<Textarea bind:value={logString} unWrappedClass="resize-none h-[45vh]" disabled />
+<div bind:this={logElement} class="h-[250px] overflow-auto">
+	{#each log as l}
+        <p class="text-sm">{l}</p>
+    {/each}
+</div>
 
 <form class="row" on:submit|preventDefault={write_serial_port}>
     <div class="grid grid-cols-2 flex">
@@ -41,7 +58,7 @@
         </div>
         <div class="text-right">
             <ButtonGroup>
-            <Button color="blue" on:click={() => {log = new Array(10);}} disabled={port == null}>Clear</Button>
+            <Button color="blue" on:click={() => {log = []; logIndex = 0;}} disabled={port == null}>Clear</Button>
             <Button color="green" type="submit" disabled={port == null}>Send</Button>
             </ButtonGroup>
         </div>
