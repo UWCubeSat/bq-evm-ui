@@ -14,10 +14,10 @@ uint16_t read_from_msp(unsigned int reg, int size) {
   Wire.beginTransmission(msp_address);
   Wire.write(reg);
   Wire.endTransmission(false);
-  Wire.requestFrom(msp_address, size , true);
+  Wire.requestFrom(msp_address, 1);
 
-  unsigned int returnInt = 0;
-  for(int i = 0; i < size; i++) {
+  unsigned int returnInt = Wire.read();
+  for(int i = 0; i < size-1; i++) {
     returnInt = (returnInt << 8) | Wire.read();
   }
 
@@ -35,8 +35,8 @@ uint16_t read_from_bq(unsigned int reg, int size) {
   Wire.endTransmission(false);
   Wire.requestFrom((bq_address), size);
 
-  unsigned int returnInt = 0;
-  for(int i = 0; i < size; i++) {
+  unsigned int returnInt = Wire.read();
+  for(int i = 0; i < size-1; i++) {
     returnInt = (returnInt << 8) | Wire.read();
   }
 
@@ -44,7 +44,7 @@ uint16_t read_from_bq(unsigned int reg, int size) {
 }
 
 void write_to_bq(unsigned int reg, uint8_t data) {
-  // Write to BQ76925
+  // Read from BQ76925
   // From: https://www.ti.com/lit/ds/symlink/bq76925.pdf?ts=1705535736818
   // I2C is not really standardized so things happen however chip manus want it to.
   // This chip encodes both the I2C address AND the register into one address.
