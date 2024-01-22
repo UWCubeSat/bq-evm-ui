@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "bq-evm",
+    "productName": "bq-evm-ui",
     "version": "0.0.0"
   },
   "tauri": {
@@ -20,7 +20,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "com.kiboigo.bqevmui",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -36,7 +36,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "bq-evm",
+        "title": "BQ-EVM-UI",
         "width": 800,
         "height": 600
       }

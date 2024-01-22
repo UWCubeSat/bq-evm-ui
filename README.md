@@ -1,7 +1,6 @@
-# Tauri + Svelte + Typescript
+# BQ-EVM-UI
 
-This template should help get you started developing with Tauri, Svelte and TypeScript in Vite.
+This is intended to give a GUI for interfacing with the BQ76925-EVM from TI without a USB-to-GPIO.
 
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+## Arduino
+An Arduino file is provided in the /arduino directory that contains everything needed to interface with it over the given USB port.

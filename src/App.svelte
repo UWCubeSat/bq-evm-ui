@@ -1,40 +1,32 @@
 <script lang="ts">
     import { Tabs, TabItem } from 'flowbite-svelte';
-    import PrintPorts from './lib/PrintPorts.svelte';
-    import OpenPort from './lib/OpenPort.svelte';
-    import ReadPort from './lib/ReadPort.svelte';
+    import Connect from './lib/Connect.svelte';
+    import PortHeader from './lib/PortHeader.svelte';
+    import Terminal from './lib/Terminal.svelte';
 
-    // We will have two screens.
-    // One for the MSP430
-    // One for the BQ
-    
-    // Both of these will allow for you to send a Serial Command
-    // Both will let you read a response
+    let portPath: string | null = null;
 </script>
 
 <main>
-    <h1 class="text-center my-[2%]">BQ-EVM Eval Tool</h1>
-
-    <Tabs style="full">
-      <TabItem open title="MSP430">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          <b>Profile:</b>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        </p>
-      </TabItem>
-      <TabItem title="BQ76925">
-        <p class="text-sm text-gray-500 dark:text-gray-400">
-          <b>Settings:</b>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        </p>
-      </TabItem>
-      <TabItem title="Utilities">
-        <div class="text-center">
-            <PrintPorts />
-            <OpenPort />
-            <ReadPort />
+        <div class="grid grid-cols-2 text-center align-item-center my-[2.5%]">
+            <div>
+                <h1 class="text-center text-xl font-bold">BQ-EVM-UI</h1>
+            </div>
+            <div>
+                <PortHeader bind:portPath />
+            </div>
         </div>
-      </TabItem>
-    </Tabs>
 
+    <div class="w-[90%] m-auto">
+        <Tabs style="full" defaultClass="flex rounded-lg divide-x rtl:divide-x-reverse divide-gray-400 shadow dark:divide-gray-700">
+            <TabItem open title="Connect" class="w-full">
+                <div class="text-center">
+                    <Connect bind:port={portPath} />
+                </div>
+            </TabItem>
+            <TabItem title="Terminal" class="w-full">
+                <Terminal port={portPath} />
+            </TabItem>
+        </Tabs>
+    </div>
 </main>
