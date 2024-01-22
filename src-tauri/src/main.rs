@@ -42,7 +42,8 @@ fn open_serial_port(port_state: tauri::State<PortState>, port_name: &str, baud_r
         Ok(p) => p,
         Err(e) => match e.kind {
             ErrorKind::NoDevice => return 1,
-            _ => return 2,
+            ErrorKind::Io(_) => return 3,
+            _ => return 4,
         },
     };
 
@@ -56,7 +57,7 @@ fn open_serial_port(port_state: tauri::State<PortState>, port_name: &str, baud_r
             return 0;
         }
         Err(_) => {
-            return 3;
+            return 2;
         }
     }
 }

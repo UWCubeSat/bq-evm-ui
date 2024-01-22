@@ -28,6 +28,11 @@
                 break;
             }
 
+            case StatusCode.UNKNOWN: {
+                portError = port_name + ": Error Opening Port (In use by another process?)"; 
+                break;
+            }
+
             default: {
                 portError = port_name + ": " + portResponse;
                 break;

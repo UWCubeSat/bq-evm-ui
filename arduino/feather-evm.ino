@@ -14,7 +14,7 @@ uint16_t read_from_msp(unsigned int reg, int size) {
   Wire.beginTransmission(msp_address);
   Wire.write(reg);
   Wire.endTransmission(false);
-  Wire.requestFrom(msp_address, 1);
+  Wire.requestFrom(msp_address, size);
 
   unsigned int returnInt = Wire.read();
   for(int i = 0; i < size-1; i++) {
@@ -70,7 +70,7 @@ int get_register_from_params(String command_params) {
 
 int get_third_from_params(String command_params) {
   String sub = command_params.substring(command_params.indexOf(' '));
-  String third = sub.substring(command_params.indexOf(' ')+1);
+  String third = sub.substring(command_params.indexOf(' '));
   return third.toInt();
 }
 
@@ -92,10 +92,11 @@ void loop() {
     if (x == '\n')
     {
       input[i] = 0x00;
+
       String command = String(input);
       String command_head = command.substring(0, command.indexOf(' '));
       String command_params = command.substring(command.indexOf(' ') + 1);
-      
+    
       unsigned int device = get_device_from_params(command_params);
       unsigned int reg = get_register_from_params(command_params);
       unsigned int third = get_third_from_params(command_params);
