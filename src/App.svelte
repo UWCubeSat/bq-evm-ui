@@ -3,6 +3,7 @@
     import Connect from './lib/Connect.svelte';
     import PortHeader from './lib/PortHeader.svelte';
     import Terminal from './lib/Terminal.svelte';
+    import Polling from './lib/Polling.svelte';
 
     let portPath: string | null = null;
 </script>
@@ -23,6 +24,9 @@
                 <div class="text-center">
                     <Connect bind:port={portPath} />
                 </div>
+            </TabItem>
+            <TabItem title="Polling" class="w-full">
+                <Polling /> 
             </TabItem>
             <TabItem title="Terminal" class="w-full">
                 <Terminal port={portPath} />
