@@ -48,7 +48,6 @@ fn open_serial_port(port_state: tauri::State<PortState>, port_name: &str, baud_r
     };
 
     new_port.write_data_terminal_ready(true).unwrap();
-    new_port.set_flow_control(serialport::FlowControl::Hardware).unwrap();
 
     // Check the Port State.
     let port_guard_result = port_state.port.lock();
