@@ -38,7 +38,7 @@ fn open_serial_port(port_state: tauri::State<PortState>, port_name: &str, baud_r
         .timeout(Duration::from_millis(5000))
         .open();
 
-    let new_port = match new_port_result {
+    let mut new_port = match new_port_result {
         Ok(p) => p,
         Err(e) => match e.kind {
             ErrorKind::NoDevice => return 1,
@@ -46,6 +46,9 @@ fn open_serial_port(port_state: tauri::State<PortState>, port_name: &str, baud_r
             _ => return 4,
         },
     };
+
+    new_port.write_data_terminal_ready(true).unwrap();
+    new_port.set_flow_control(serialport::FlowControl::Hardware).unwrap();
 
     // Check the Port State.
     let port_guard_result = port_state.port.lock();
