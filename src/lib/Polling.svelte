@@ -45,6 +45,16 @@
                 cells_adc[i] = await send_serial_command("read ard 5");
                 let cellVoltage = parseInt(cells_adc[i])/1024 * 3.3;
 
+                returnedByte = await send_serial_command("read bq 27").toString(2);
+                VREF_GC_4 = parseInt(returnedByte.charAt(7));
+                VREF_OC_5 = parseInt(returnedByte.charAt(5));
+                
+                VREF_GAIN_CORR =
+                VREF_OC_4 = 
+                VREF_OFFSET_CORR = 
+
+                GCVREF = (1 + ((VREF_GC_4 << 4)+ VREF_GAIN_CORR) * 0.001) + ((VREF_OC_5 << 5) + (VREF_OC_4 << 4) + VREF_OFFSET_CORR) * 0.001 / vref
+
                 // We don't use all of the Correction Data.
                 // This gets us within ~5 mV.
                 cells[i] = (cellVoltage * 1000 / 0.6).toPrecision(4);
