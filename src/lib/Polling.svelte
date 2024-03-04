@@ -45,19 +45,64 @@
                 cells_adc[i] = await send_serial_command("read ard 5");
                 let cellVoltage = parseInt(cells_adc[i])/1024 * 3.3;
 
+                // getting GCVERF
                 returnedByte = await send_serial_command("read bq 27").toString(2);
                 VREF_GC_4 = parseInt(returnedByte.charAt(7));
+                VREF_OC_4 = parseInt(returnedByte.charAt(6));
                 VREF_OC_5 = parseInt(returnedByte.charAt(5));
-                
-                VREF_GAIN_CORR =
-                VREF_OC_4 = 
-                VREF_OFFSET_CORR = 
+
+                returnedByte = await send_serial_command("read bq 16").toString(2);
+                VREF_GAIN_CORR = parseInt(returnedByte.substr(0, 4), 2);
+                VREF_OFFSET_CORR = parseInt(returnedByte.substr(4, 4), 2);
 
                 GCVREF = (1 + ((VREF_GC_4 << 4)+ VREF_GAIN_CORR) * 0.001) + ((VREF_OC_5 << 5) + (VREF_OC_4 << 4) + VREF_OFFSET_CORR) * 0.001 / vref
 
-                // We don't use all of the Correction Data.
-                // This gets us within ~5 mV.
-                cells[i] = (cellVoltage * 1000 / 0.6).toPrecision(4);
+                // getting VC_GC_4 and VC_OC_4
+				if(i < 2){
+					returnedByte = await send_serial_command("read bq 23").toString(2);
+					if(i == 0){
+						VC_GC_4 = parseInt(returnedByte.charAr(6));
+						VC_OC_4 = parseInt(returnedByte.charAr(7));
+					} else {
+						VC_GC_4 = parseInt(returnedByte.charAr(4));
+						VC_OC_4 = parseInt(returnedByte.charAr(5));
+					}	
+				} else {
+					returnedByte = await send_serial_command("read bq 24").toString(2);
+					if(i == 2){
+						VC_GC_4 = parseInt(returnedByte.charAr(6));
+						VC_OC_4 = parseInt(returnedByte.charAr(7));
+					} else if(i == 3){
+						VC_GC_4 = parseInt(returnedByte.charAr(4));
+						VC_OC_4 = parseInt(returnedByte.charAr(5));
+					} else if(i == 4){
+						VC_GC_4 = parseInt(returnedByte.charAr(2));
+						VC_OC_4 = parseInt(returnedByte.charAr(3));
+					} else if(i == 5 ){
+						VC_GC_4 = parseInt(returnedByte.charAr(0));
+						VC_OC_4 = parseInt(returnedByte.charAr(1));
+					}
+				}
+
+				// getting vc_offset_corr and vc_gain_corr
+				returnedByte = await send_serial_command("read bq " + (16 + i)).toString(2);
+                VC_GAIN_CORR = parseInt(returnedByte.substr(0, 4), 2);
+                VC_OFFSET_CORR = parseInt(returnedByte.substr(4, 4), 2);
+
+				// getting GCVCOUT and OCVCOUT
+                GCVCOUT = ((VC_GC_4 << 4) + VC_GAIN_CORR) * 0.001
+				OCVCOUT = ((VC_OC_4 << 4) + VC_OFFSET_CORR) * 0.001
+
+                // getting GVCOUT
+				returnedByte = await send_serial_command("read bq 4").toString(2);
+				REF_SEL = parseInt(returnedByte.charAt(0));
+				if(REF_SEL == 0){
+					GVCOUT = 0.3;
+				} else {
+					GVCOUT = 0.6;
+				}
+
+                cells[i] = ((cellVoltage * GCVREF + OCVCOUT) / GVCOUT * (1 + GCVCOUT)).toPrecision(4);
             }
         }, 500);
     })
